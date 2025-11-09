@@ -5,6 +5,8 @@ from time import *
 import struct
 import os
 
+# =========== SET UP ==========
+
 class Clock:
     def __init__(self, hour=0, minute=0, second=0):
         self.hour = hour
@@ -22,6 +24,7 @@ class Clock:
         if self.hour >= 24:
             self.hour = 0
 
+# ------- TIME SETTER ------
 hrs = 0
 min = 0
 b1 = Pin(0, Pin.IN, Pin.PULL_UP)
@@ -32,18 +35,19 @@ while(not b1.value()):
     print("hours", hrs)
     sleep(0.5)
 print(f"hours final", hrs)
-sleep(5)
+sleep(2)
 while(not b2.value()):
     min = (min+1) % 60
     print("mins", min)
     sleep(0.5)
 print(f"mins final", min)               
-sleep(5)
-
+sleep(3)
 clock = Clock(int(hrs), int(min), 0)
-# List files
-print(os.listdir())  # Shows files on the Pico's flash
 
+# # List files
+# print(os.listdir())  # Shows files on the Pico's flash
+
+# ------ AUDIO SET UP & FUNCS -------
 # Use PWM to simulate DAC output
 AUDIO_PIN = 22
 pwm = PWM(Pin(AUDIO_PIN))
@@ -60,6 +64,7 @@ def play_wav(name):
                 pwm.duty_u16(byte << 8)
             chunk = f.read(1024)
 
+# ------- DISPLAY SET UP AND FUCNS -------
 def pulse_enable():
     E.value(1)
     sleep(0.001)
@@ -102,6 +107,8 @@ def lcd_write(text):
     for char in text:
         send_byte(ord(char), True)
 
+
+# ----- CHIME THREAD ------
 def play_bird_call(hr, bird_file):
     try:
         print("Playing sound.wav...")
@@ -120,7 +127,7 @@ def play_chime(hr, filename):
         # thread already playing or no resources, just skip
         pass
         
-# ---- Main Program ----
+# ========= MAIN ==============
 # Define pin connections
 RS = Pin(16, Pin.OUT)
 E  = Pin(17, Pin.OUT)
