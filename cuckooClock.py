@@ -1,24 +1,8 @@
-# from machine import Pin
-# from utime import sleep
-
-# pin = Pin("LED", Pin.OUT)
-
-# print("LED starts flashing...")
-# while True:
-#     try:
-#         pin.toggle()
-#         sleep(1) # sleep 1sec
-#     except KeyboardInterrupt:
-#         break
-# pin.off()
-# print("Finished.")
-
-print("start code")
+# print("start code")
 from machine import Pin, PWM, Timer
 import _thread
 from time import *
 import struct
-
 import os
 
 class Clock:
@@ -38,7 +22,25 @@ class Clock:
         if self.hour >= 24:
             self.hour = 0
 
-clock = Clock(12, 0, 0)
+hrs = 0
+min = 0
+b1 = Pin(0, Pin.IN, Pin.PULL_UP)
+b2 = Pin(1, Pin.IN, Pin.PULL_UP)
+sleep(5)
+while(not b1.value()):
+    hrs = (hrs+1) % 24
+    print("hours", hrs)
+    sleep(0.5)
+print(f"hours final", hrs)
+sleep(5)
+while(not b2.value()):
+    min = (min+1) % 60
+    print("mins", min)
+    sleep(0.5)
+print(f"mins final", min)               
+sleep(5)
+
+clock = Clock(int(hrs), int(min), 0)
 # List files
 print(os.listdir())  # Shows files on the Pico's flash
 
@@ -104,7 +106,7 @@ def play_bird_call(hr, bird_file):
     try:
         print("Playing sound.wav...")
         for i in range(hr):
-            play_wav("Goose.wav")
+            play_wav(bird_file)
             sleep(0.03)
         print("played")
     finally:
@@ -117,16 +119,6 @@ def play_chime(hr, filename):
     except:
         # thread already playing or no resources, just skip
         pass
-
-# if (clock.second <= 1):           
-#     try:
-#         print("Playing sound.wav...")
-#         for i in range(clock.hour):
-#             play_wav("Goose.wav")
-#         print("played")
-#     finally:
-#         pwm.deinit()
-#         print("Done.")
         
 # ---- Main Program ----
 # Define pin connections
@@ -137,9 +129,8 @@ D5 = Pin(19, Pin.OUT)
 D6 = Pin(20, Pin.OUT)
 D7 = Pin(21, Pin.OUT)
 
-print("Clock started. Press SET to enter adjust mode.")
-
-while clock.second < 10:
+lcd_init()
+while True:
     try:
         clock.tick()
         send_byte(0x80)
