@@ -39,14 +39,6 @@ def play_wav(name):
                 pwm.duty_u16(byte << 8)
             chunk = f.read(1024)
 
-try:
-    print("Playing sound.wav...")
-    play_wav("Goose.wav")
-    print("played")
-finally:
-    pwm.deinit()
-    print("Done.")
-
 def pulse_enable():
     E.value(1)
     sleep(0.001)
@@ -125,8 +117,17 @@ while clock.second < 10:
         clock.tick()
         send_byte(0x80)
         lcd_write("Time: {:02d}:{:02d}:{:02d}".format(clock.hour, clock.minute, clock.second))
+        if (clock.second <= 1):           
+            try:
+                print("Playing sound.wav...")
+                for i in range(clock.hour):
+                    play_wav("Goose.wav")
+                print("played")
+            finally:
+                pwm.deinit()
+                print("Done.")
         send_byte(0xC0)  # Move cursor to line 2
-        lcd_write("goose")
+        lcd_write("Goose")
         sleep(1)  # sleep 1 sec
     except KeyboardInterrupt:
         break
