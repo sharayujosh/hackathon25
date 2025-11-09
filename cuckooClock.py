@@ -15,6 +15,7 @@
 
 print("start code")
 from machine import Pin, PWM, Timer
+import _thread
 from time import *
 import struct
 
@@ -99,6 +100,24 @@ def lcd_write(text):
     for char in text:
         send_byte(ord(char), True)
 
+def play_bird_call(hr, bird_file):
+    try:
+        print("Playing sound.wav...")
+        for i in range(hr):
+            play_wav("Goose.wav")
+            sleep(0.03)
+        print("played")
+    finally:
+        pwm.deinit()
+        print("Done.")
+
+def play_chime(hr, filename):
+    try:
+        _thread.start_new_thread(play_bird_call, (hr, filename))
+    except:
+        # thread already playing or no resources, just skip
+        pass
+
 # if (clock.second <= 1):           
 #     try:
 #         print("Playing sound.wav...")
@@ -126,55 +145,9 @@ while clock.second < 10:
         send_byte(0x80)
         lcd_write("Time: {:02d}:{:02d}:{:02d}".format(clock.hour, clock.minute, clock.second))
         if (clock.second <= 1):           
-            try:
-                print("Playing sound.wav...")
-                for i in range(clock.hour):
-                    play_wav("Goose.wav")
-                print("played")
-            finally:
-                pwm.deinit()
-                print("Done.")
+            play_chime(clock.hour, "Goose.wav")
         send_byte(0xC0)  # Move cursor to line 2
         lcd_write("Goose")
         sleep(1)  # sleep 1 sec
     except KeyboardInterrupt:
-        break      
-
-# class Clock:
-#     def __init__(self, hour=0, minute=0, second=0):
-#         self.hour = hour
-#         self.minute = minute
-#         self.second = second
-
-#     def tick(self):
-#         self.second += 1
-#         if self.second >= 60:
-#             self.second = 0
-#             self.minute += 1
-#         if self.minute >= 60:
-#             self.minute = 0
-#             self.hour += 1
-#         if self.hour >= 24:
-#             self.hour = 0
-
-# clock = Clock(12, 0, 0)
-
-# while clock.second < 10:
-#     try:
-#         clock.tick()
-#         send_byte(0x80)
-#         lcd_write("Time: {:02d}:{:02d}:{:02d}".format(clock.hour, clock.minute, clock.second))
-#         if (clock.second <= 1):           
-#             try:
-#                 print("Playing sound.wav...")
-#                 for i in range(clock.hour):
-#                     play_wav("Goose.wav")
-#                 print("played")
-#             finally:
-#                 pwm.deinit()
-#                 print("Done.")
-#         send_byte(0xC0)  # Move cursor to line 2
-#         lcd_write("Goose")
-#         sleep(1)  # sleep 1 sec
-#     except KeyboardInterrupt:
-#         break
+        break
