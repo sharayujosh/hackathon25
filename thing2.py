@@ -16,35 +16,19 @@
 print("start code")
 from machine import Pin, PWM
 from time import sleep
-from waveplayer import WavePlayer
 import struct
+# import os
 
-# SPEAKER_PIN = 22
-# speaker = PWM(Pin(SPEAKER_PIN))
+# # List files
+# print(os.listdir())  # Shows files on the Pico's flash
 
-# def play_tone(freq, duration):
-#     speaker.freq(freq)
-#     speaker.duty_u16(32768)
-#     sleep(duration)
-#     speaker.duty_u16(0)
-#     sleep(0.02)
-
-# # Simple melody (Super Mario theme snippet)
-# melody = [
-#     (659, 0.1), (659, 0.1), (0, 0.1), (659, 0.1),
-#     (0, 0.1), (523, 0.1), (659, 0.1), (0, 0.1),
-#     (784, 0.1), (0, 0.3), (392, 0.1)
-# ]
-
-# try:
-#     for note, dur in melody:
-#         if note == 0:
-#             speaker.duty_u16(0)
-#             sleep(dur)
-#         else:
-#             play_tone(note, dur)
-# finally:
-#     speaker.deinit()
+# # Delete a file
+# filename = "sound.wav"
+# if filename in os.listdir():
+#     os.remove(filename)
+#     print(f"{filename} deleted")
+# else:
+#     print(f"{filename} not found")
 
 # Use PWM to simulate DAC output
 AUDIO_PIN = 22
@@ -52,8 +36,8 @@ pwm = PWM(Pin(AUDIO_PIN))
 pwm.freq(22050)  # base PWM frequency (fast enough for audio)
 
 def play_wav(name):
-    with open("sound.wav", "rb") as f:
-        # Skip 44-byte WAV header
+    with open(name, "rb") as f:
+        # Skip WAV header
         f.read(44)
         chunk = f.read(1024)
         while chunk:
@@ -64,7 +48,7 @@ def play_wav(name):
 
 try:
     print("Playing sound.wav...")
-    play_wav("sound.wav")
+    play_wav("Goose.wav")
     print("played")
 finally:
     pwm.deinit()
