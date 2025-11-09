@@ -17,18 +17,11 @@ print("start code")
 from machine import Pin, PWM
 from time import sleep
 import struct
-# import os
 
-# # List files
-# print(os.listdir())  # Shows files on the Pico's flash
+import os
 
-# # Delete a file
-# filename = "sound.wav"
-# if filename in os.listdir():
-#     os.remove(filename)
-#     print(f"{filename} deleted")
-# else:
-#     print(f"{filename} not found")
+# List files
+print(os.listdir())  # Shows files on the Pico's flash
 
 # Use PWM to simulate DAC output
 AUDIO_PIN = 22
@@ -108,6 +101,32 @@ D7 = Pin(21, Pin.OUT)
 print("pins defined")
 lcd_init()
 print("pins intitalized 2")
-lcd_write("Hello, world!")
-send_byte(0xC0)  # Move cursor to line 2
-lcd_write("Line two here")
+class Clock:
+    def __init__(self, hour=0, minute=0, second=0):
+        self.hour = hour
+        self.minute = minute
+        self.second = second
+
+    def tick(self):
+        self.second += 1
+        if self.second >= 60:
+            self.second = 0
+            self.minute += 1
+        if self.minute >= 60:
+            self.minute = 0
+            self.hour += 1
+        if self.hour >= 24:
+            self.hour = 0
+
+clock = Clock(12, 0, 0)
+
+while clock.second < 10:
+    try:
+        clock.tick()
+        send_byte(0x80)
+        lcd_write("Time: {:02d}:{:02d}:{:02d}".format(clock.hour, clock.minute, clock.second))
+        send_byte(0xC0)  # Move cursor to line 2
+        lcd_write("goose")
+        sleep(1)  # sleep 1 sec
+    except KeyboardInterrupt:
+        break
